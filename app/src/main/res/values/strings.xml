@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MyWeather</string>
+
+    <!--  ToolBar  -->
+    <string name="chose_city">City list</string>
+    <string name="share">Share</string>
+    <string name="settings">Settings</string>
+
+</resources>
