@@ -9,15 +9,16 @@ import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import com.qweather.plugin.view.QWeatherConfig
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var weatherBinder: WeatherService.WeatherBinder
+    private lateinit var weatherService: WeatherService
     private var mBound: Boolean = false
 
     private val connection = object : ServiceConnection {
@@ -28,7 +29,10 @@ class MainActivity : AppCompatActivity() {
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
             Log.d("MainActivity", "OnServiceConnected")
             weatherBinder = p1 as WeatherService.WeatherBinder
+            weatherService = weatherBinder.service
             mBound = true
+
+            weatherBinder.parse_raw_data()
         }
 
         /**
@@ -44,17 +48,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-//        QWeatherConfig.init("d877ed5d19aa4c8ab209bf911c5fe561", )
-
-        /**
-         * 客户端通过调用 bindService() 绑定到服务。
-         * bindService() 的返回值指示所请求的服务是否存在，以及是否允许客户端访问该服务。
-         * 调用时，它必须提供 ServiceConnection 的实现，后者会监控与服务的连接。
-         */
-        Intent(this, WeatherService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
 
         /**
          * 设置导航栏按钮
@@ -81,11 +74,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         main_fab.setOnClickListener {
-            Toast.makeText(this, "main fab clicked", Toast.LENGTH_SHORT).show()
-            main_fab.setImageResource(R.drawable.ic_menu)
-            weatherBinder.get_raw_data()
-            main_fab.setImageResource(R.drawable.ic_refresh)
+            Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
+            updateFrame()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        /**
+         * 客户端通过调用 bindService() 绑定到服务。
+         * bindService() 的返回值指示所请求的服务是否存在，以及是否允许客户端访问该服务。
+         * 调用时，它必须提供 ServiceConnection 的实现，后者会监控与服务的连接。
+         */
+        Intent(this, WeatherService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        mBound = false
     }
 
     /**
@@ -118,6 +127,34 @@ class MainActivity : AppCompatActivity() {
             }
 
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun updateFrame() {
+        if (mBound) {
+            progress_view.visibility = View.VISIBLE
+            weatherBinder.parse_raw_data()
+            main_fab.setImageResource(R.drawable.ic_menu)
+            edit_obsTime.let {
+                it.setText(weatherService.getObsTime())
+            }
+            edit_temp.let {
+                it.setText(weatherService.getTemp())
+            }
+            edit_feelsLike.let {
+                it.setText(weatherService.getFeelsLike())
+            }
+            edit_text.let {
+                it.setText(weatherService.getText())
+            }
+            edit_windDir.let {
+                it.setText(weatherService.getWindDir())
+            }
+            edit_pressure.let {
+                it.setText(weatherService.getPressure())
+            }
+            main_fab.setImageResource(R.drawable.ic_refresh)
+            progress_view.visibility = View.INVISIBLE
         }
     }
 }

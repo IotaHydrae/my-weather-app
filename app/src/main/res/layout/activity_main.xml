@@ -15,10 +15,10 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/main_fab"
@@ -28,7 +28,136 @@
             android:layout_margin="16dp"
             android:src="@drawable/ic_refresh"/>
 
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="55dp"
+            android:padding="10dp"
+            android:background="@color/colorPrimary">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/userIcon"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_mouse"
+                android:layout_alignParentBottom="true"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:layout_alignParentStart="true">
+                <TextView
+                    android:id="@+id/text_obsTime"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="数据观测时间"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+                <EditText
+                    android:id="@+id/edit_obsTime"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/text_temp"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="温度"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+                <EditText
+                    android:id="@+id/edit_temp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/text_feelsLike"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="体感温度"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+                <EditText
+                    android:id="@+id/edit_feelsLike"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/text_text"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="天气状况"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+                <EditText
+                    android:id="@+id/edit_text"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/text_windDir"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="风向"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+                <EditText
+                    android:id="@+id/edit_windDir"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/text_pressure"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="大气压"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"/>
+                <EditText
+                    android:id="@+id/edit_pressure"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+
+                <ProgressBar
+                    android:id="@+id/progress_view"
+                    android:background="@color/colorPrimaryDark"
+                    android:layout_gravity="center"
+                    android:visibility="invisible"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+
+        </RelativeLayout>
     </FrameLayout>
+
+
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"
@@ -39,3 +168,4 @@
         app:headerLayout="@layout/nav_header"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
+

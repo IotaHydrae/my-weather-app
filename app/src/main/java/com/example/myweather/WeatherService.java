@@ -4,92 +4,238 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Process;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.alibaba.fastjson.JSON;
+import com.example.myweather.weather.Weather;
+import com.example.myweather.weather.WeatherData;
+import com.example.myweather.weather.WeatherInterface;
+import com.example.myweather.weather.WeatherNow;
+
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class WeatherService extends Service {
-    private String log_deug_tag = "WeatherService";
+public class WeatherService extends Service implements WeatherInterface {
+    private final String log_deug_tag = "WeatherService";
+    private String raw_data;
+    private Looper serviceLooper;
+    private WeatherServiceHandler weatherServiceHandler;
+
+    private WeatherData weatherData;
+    private Weather weather;
+    private WeatherNow weatherNow;
 
     public WeatherService() {
     }
 
-    private WeatherBinder weatherBinder=null;
+    private final class WeatherServiceHandler extends Handler {
+        public WeatherServiceHandler(Looper looper) {
+            super(looper);
+        }
 
-    protected final class WeatherBinder extends Binder{
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            stopSelf();
+        }
+    }
+
+    private final WeatherBinder weatherBinder = new WeatherBinder();
+
+    protected final class WeatherBinder extends Binder {
         private HttpURLConnection connection = null;
-        private String location = "101010100";
-        private String key = "d877ed5d19aa4c8ab209bf911c5fe561";
+        private final String location = "101010100";
+        private final String key = "d877ed5d19aa4c8ab209bf911c5fe561";
 
-        public WeatherBinder(){
+        public WeatherBinder() {
             super();
         }
 
-        public void get_raw_data(){
+        WeatherService getService() {
+            return WeatherService.this;
+        }
+
+        public void parse_raw_data() {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try{
+                    try {
                         StringBuilder stringBuilder = new StringBuilder();
-//                        https://free-api.heweather.net/s6/weather/now?location=101010100&key=d877ed5d19aa4c8ab209bf911c5fe561
-//                        String bytes = String.format("https://devapi.qweather.com/v7/weather/24h?location=%s&key=%s",location,key);
-                        String bytes = String.format("https://free-api.heweather.net/s6/weather/now?location=%s&key=%s",location,key);
+                        String bytes = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
                         Log.d(log_deug_tag, bytes);
                         URL url = new URL(bytes);
                         connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("GET");
                         connection.setReadTimeout(8000);
                         connection.setConnectTimeout(8000);
-//                        DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
-//
-//                        dataOutputStream.writeBytes(bytes);
                         InputStream inputStream = connection.getInputStream();
+                        BufferedReader reader =
+                                new BufferedReader(new InputStreamReader(inputStream));
+                        raw_data = reader.readLine();
+                        Log.d("WeatherService", raw_data);
+                        reader.close();
 
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                        Log.d("WeatherService", reader.readLine().toString());
-                    }catch (Exception e){
+                        JSONObject object = new JSONObject(raw_data);
+                        String name = object.getString("code");
+                        Log.d(log_deug_tag, name);
+
+                        /**
+                         * 解析json数据
+                         */
+                        weather = JSON.parseObject(raw_data, Weather.class);
+                        Log.d(log_deug_tag, weather.getNow());
+                        weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
+                        Log.d(log_deug_tag, weatherNow.getWindDir());
+                    } catch (Exception e) {
                         e.printStackTrace();
-                    }finally {
+                    } finally {
                         connection.disconnect();
                     }
                 }
             }).start();
+
         }
 
-        public void get_progress(){
-
+        public String get_progress() {
+            return raw_data;
         }
 
     }
+
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(log_deug_tag, "onBind start");
-        weatherBinder = new WeatherBinder();
         return weatherBinder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
+        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+
+        Message msg = weatherServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        weatherServiceHandler.sendMessage(msg);
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onCreate() {
-        super.onCreate();
+        HandlerThread thread = new HandlerThread("ServiceStartArguments",
+                Process.THREAD_PRIORITY_BACKGROUND);
+        thread.start();
+        serviceLooper = thread.getLooper();
+        weatherServiceHandler = new WeatherServiceHandler(serviceLooper);
+    }
+
+    @Override
+    public String getCode() {
+        return weather.getCode();
+    }
+
+    @Override
+    public String getUpdateTime() {
+        return weather.getUpdateTime();
+    }
+
+    @Override
+    public String getFxLink() {
+        return weather.getFxLink();
+    }
+
+    @Override
+    public String getObsTime() {
+        return weatherNow.getObstime();
+    }
+
+    @Override
+    public String getTemp() {
+        return weatherNow.getTemp();
+    }
+
+    @Override
+    public String getFeelsLike() {
+        return weatherNow.getFeelsLike();
+    }
+
+    @Override
+    public String getIcon() {
+        return weatherNow.getIcon();
+    }
+
+    @Override
+    public String getText() {
+        return weatherNow.getText();
+    }
+
+    @Override
+    public String getWind360() {
+        return weatherNow.getWind360();
+    }
+
+    @Override
+    public String getWindDir() {
+        return weatherNow.getWindDir();
+    }
+
+    @Override
+    public String getWindScale() {
+        return weatherNow.getWindScale();
+    }
+
+    @Override
+    public String getWindSpeed() {
+        return weatherNow.getWindSpeed();
+    }
+
+    @Override
+    public String getHumidity() {
+        return weatherNow.getHumidity();
+    }
+
+    @Override
+    public String getPrecip() {
+        return weatherNow.getPrecip();
+    }
+
+    @Override
+    public String getPressure() {
+        return weatherNow.getPressure();
+    }
+
+    @Override
+    public String getVis() {
+        return weatherNow.getVis();
+    }
+
+    @Override
+    public String getCloud() {
+        return weatherNow.getCloud();
+    }
+
+    @Override
+    public String getDew() {
+        return weatherNow.getDew();
     }
 }
