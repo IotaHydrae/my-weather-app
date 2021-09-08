@@ -74,46 +74,7 @@ public class WeatherService extends Service implements WeatherInterface {
             return WeatherService.this;
         }
 
-        /**
-         * 解析原始数据并存储到java bean中
-         */
-        public void parse_raw_data() {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        HttpURLConnection connection;
-                        String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
-                        Log.d(log_deug_tag, url_str);
-                        URL url = new URL(url_str);
-                        connection = (HttpURLConnection) url.openConnection();
-                        connection.setRequestMethod("GET");
-                        connection.setReadTimeout(500);
-                        connection.setConnectTimeout(500);
-                        InputStream inputStream = connection.getInputStream();
-                        BufferedReader reader =
-                                new BufferedReader(new InputStreamReader(inputStream));
-                        raw_data = reader.readLine();
-                        Log.d("WeatherService", raw_data);
-                        reader.close();
 
-                        /**
-                         * 使用FastJson解析json数据
-                         * weather: 顶层数据
-                         * weatherNow: 内层now数据
-                         */
-                        weather = JSON.parseObject(raw_data, Weather.class);
-                        Log.d(log_deug_tag, weather.getNow());
-                        weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
-                        Log.d(log_deug_tag, weatherNow.getWindDir());
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-
-        }
     }
 
     @Override
@@ -145,7 +106,46 @@ public class WeatherService extends Service implements WeatherInterface {
         serviceLooper = thread.getLooper();
         weatherServiceHandler = new WeatherServiceHandler(serviceLooper);
     }
+    /**
+     * 解析原始数据并存储到java bean中
+     */
+    public void parse_raw_data() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpURLConnection connection;
+                    String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
+                    Log.d(log_deug_tag, url_str);
+                    URL url = new URL(url_str);
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setReadTimeout(500);
+                    connection.setConnectTimeout(500);
+                    InputStream inputStream = connection.getInputStream();
+                    BufferedReader reader =
+                            new BufferedReader(new InputStreamReader(inputStream));
+                    raw_data = reader.readLine();
+                    Log.d("WeatherService", raw_data);
+                    reader.close();
 
+                    /**
+                     * 使用FastJson解析json数据
+                     * weather: 顶层数据
+                     * weatherNow: 内层now数据
+                     */
+                    weather = JSON.parseObject(raw_data, Weather.class);
+                    Log.d(log_deug_tag, weather.getNow());
+                    weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
+                    Log.d(log_deug_tag, weatherNow.getWindDir());
+                    Log.d(log_deug_tag, weatherNow.toStringList());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
 //    public void get_raw_json() {
 //        new Thread(new Runnable() {
 //            @Override

@@ -13,5 +13,7 @@
     <string name="weather_windDir">Wind direction</string>
     <string name="weather_pressure">Atmospheric pressure</string>
     <string name="exit">Exit</string>
+    <string name="weather">Weather</string>
+    <string name="location">GNSS</string>
 
 </resources>

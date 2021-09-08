@@ -11,4 +11,6 @@
     <string name="weather_windDir">风向</string>
     <string name="weather_pressure">大气压</string>
     <string name="exit">退出</string>
+    <string name="weather">天气</string>
+    <string name="location">位置服务</string>
 </resources>

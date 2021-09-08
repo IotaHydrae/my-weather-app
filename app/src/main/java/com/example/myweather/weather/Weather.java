@@ -56,4 +56,16 @@ public class Weather {
     public void setLicense(String license) {
         this.license = license;
     }
+
+    @Override
+    public String toString() {
+        return "Weather{" +
+                "code='" + code + '\'' +
+                ", updateTime='" + updateTime + '\'' +
+                ", fxLink='" + fxLink + '\'' +
+                ", now='" + now + '\'' +
+                ", refer='" + refer + '\'' +
+                ", license='" + license + '\'' +
+                '}';
+    }
 }

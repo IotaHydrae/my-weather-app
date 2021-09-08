@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             weatherService = weatherBinder.service
             mBound = true
 
-            weatherBinder.parse_raw_data()
+            weatherService.parse_raw_data()
         }
 
 
@@ -79,21 +80,19 @@ class MainActivity : AppCompatActivity() {
          */
         main_fab.setOnClickListener { view ->
             var status: Boolean
-//            var flag: Boolean = false
 
-//            Snackbar.make(view, "是否刷新数据？", Snackbar.LENGTH_SHORT)
-//                .setAction("是") {
-//                    flag = true
+            Snackbar.make(view, "是否刷新数据？", Snackbar.LENGTH_SHORT)
+                .setAction("是") {
+//                    status = updateWeatherDisplay()
 //
-//                }
-//                .show()
+//                    if (status)
+//                        Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
+//                    else
+//                        Toast.makeText(this, "数据刷新失败！", Toast.LENGTH_SHORT).show()
+                }
+                .show()
 
-            status = updateWeatherDisplay()
-//
-//            if (status)
-//                Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
-//            else
-//                Toast.makeText(this, "数据刷新失败！", Toast.LENGTH_SHORT).show()
+
         }
         /**
          * 设置Tablayout属性
@@ -153,10 +152,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateWeatherDisplay(): Boolean {
-        if (mBound) {
-            progress_view.visibility = View.VISIBLE
-            weatherBinder.parse_raw_data()
+//    private fun updateWeatherDisplay(): Boolean {
+//        if (mBound) {
+//            progress_view.visibility = View.VISIBLE
+//            weatherService.parse_raw_data()
 //            main_fab.setImageResource(R.drawable.ic_menu)
 //            try {
 //                weatherService.getObsTime()?.let {
@@ -181,14 +180,12 @@ class MainActivity : AppCompatActivity() {
 //                e.printStackTrace()
 //                return false
 //            } finally {
-            main_fab.setImageResource(R.drawable.ic_refresh)
-            progress_view.visibility = View.INVISIBLE
+//                main_fab.setImageResource(R.drawable.ic_refresh)
+//                progress_view.visibility = View.INVISIBLE
 //            }
 //        } else {
 //            return false
 //        }
-
-        }
-        return true
-    }
+//        return true
+//    }
 }

@@ -136,4 +136,43 @@ public class WeatherNow {
     public void setDew(String dew) {
         this.dew = dew;
     }
+
+    @Override
+    public String toString() {
+        return "WeatherNow{" +
+                "obstime='" + obstime + '\'' +
+                ", temp='" + temp + '\'' +
+                ", feelsLike='" + feelsLike + '\'' +
+                ", icon='" + icon + '\'' +
+                ", text='" + text + '\'' +
+                ", wind360='" + wind360 + '\'' +
+                ", windDir='" + windDir + '\'' +
+                ", windScale='" + windScale + '\'' +
+                ", windSpeed='" + windSpeed + '\'' +
+                ", humidity='" + humidity + '\'' +
+                ", precip='" + precip + '\'' +
+                ", pressure='" + pressure + '\'' +
+                ", vis='" + vis + '\'' +
+                ", cloud='" + cloud + '\'' +
+                ", dew='" + dew + '\'' +
+                '}';
+    }
+
+    public String toStringList() {
+        return obstime +
+                "," + temp +
+                "," + feelsLike +
+                "," + icon +
+                "," + text +
+                "," + wind360 +
+                "," + windDir +
+                "," + windScale +
+                "," + windSpeed +
+                "," + humidity +
+                "," + precip +
+                "," + pressure +
+                "," + vis +
+                "," + cloud +
+                "," + dew;
+    }
 }
