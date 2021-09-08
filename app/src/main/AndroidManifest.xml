@@ -14,10 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyWeather">
-        <activity
-            android:name=".MainActivity2"
-            android:exported="true">
-        </activity>
 
         <service
             android:name=".WeatherService"

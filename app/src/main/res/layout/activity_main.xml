@@ -54,9 +54,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:text="数据观测时间"
+                    android:text="@string/weather_obsTime"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="18sp"/>
                 <EditText
                     android:id="@+id/edit_obsTime"
                     android:textColor="@color/white"
@@ -70,9 +70,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:text="温度"
+                    android:text="@string/weather_temp"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="18sp"/>
                 <EditText
                     android:id="@+id/edit_temp"
                     android:textColor="@color/white"
@@ -85,9 +85,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:text="体感温度"
+                    android:text="@string/weather_feelsLike"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="18sp"/>
                 <EditText
                     android:id="@+id/edit_feelsLike"
                     android:textColor="@color/white"
@@ -101,9 +101,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:text="天气状况"
+                    android:text="@string/weather_text"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="18sp"/>
                 <EditText
                     android:id="@+id/edit_text"
                     android:textColor="@color/white"
@@ -117,9 +117,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:text="风向"
+                    android:text="@string/weather_windDir"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="18sp"/>
                 <EditText
                     android:id="@+id/edit_windDir"
                     android:textColor="@color/white"
@@ -133,9 +133,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:text="大气压"
+                    android:text="@string/weather_pressure"
                     android:textColor="#FFFFFF"
-                    android:textSize="14sp"/>
+                    android:textSize="18sp"/>
                 <EditText
                     android:id="@+id/edit_pressure"
                     android:textColor="@color/white"

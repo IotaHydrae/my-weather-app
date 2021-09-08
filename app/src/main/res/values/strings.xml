@@ -6,4 +6,11 @@
     <string name="share">Share</string>
     <string name="settings">Settings</string>
 
+    <string name="weather_obsTime">Data observation time</string>
+    <string name="weather_temp">Temperature</string>
+    <string name="weather_feelsLike">Somatosensory temperature</string>
+    <string name="weather_text">Weather condition</string>
+    <string name="weather_windDir">Wind direction</string>
+    <string name="weather_pressure">Atmospheric pressure</string>
+
 </resources>

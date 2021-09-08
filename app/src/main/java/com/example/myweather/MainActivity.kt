@@ -74,8 +74,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         main_fab.setOnClickListener {
-            Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
             updateFrame()
+            Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
         }
     }
 

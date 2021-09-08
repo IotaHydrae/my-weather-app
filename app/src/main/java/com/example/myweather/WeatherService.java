@@ -20,8 +20,6 @@ import com.example.myweather.weather.WeatherData;
 import com.example.myweather.weather.WeatherInterface;
 import com.example.myweather.weather.WeatherNow;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,7 +47,7 @@ public class WeatherService extends Service implements WeatherInterface {
         @Override
         public void handleMessage(@NonNull Message msg) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -72,6 +70,9 @@ public class WeatherService extends Service implements WeatherInterface {
             return WeatherService.this;
         }
 
+        /**
+         * 解析原始数据并存储到java bean中
+         */
         public void parse_raw_data() {
             new Thread(new Runnable() {
                 @Override
@@ -92,12 +93,17 @@ public class WeatherService extends Service implements WeatherInterface {
                         Log.d("WeatherService", raw_data);
                         reader.close();
 
-                        JSONObject object = new JSONObject(raw_data);
-                        String name = object.getString("code");
-                        Log.d(log_deug_tag, name);
+                        /**
+                         * 原始Json解析方法
+                         */
+//                        JSONObject object = new JSONObject(raw_data);
+//                        String name = object.getString("code");
+//                        Log.d(log_deug_tag, name);
 
                         /**
-                         * 解析json数据
+                         * 使用FastJson解析json数据
+                         * weather: 顶层数据
+                         * weatherNow: 内层now数据
                          */
                         weather = JSON.parseObject(raw_data, Weather.class);
                         Log.d(log_deug_tag, weather.getNow());
@@ -113,6 +119,11 @@ public class WeatherService extends Service implements WeatherInterface {
 
         }
 
+        /**
+         * 获取任务进度
+         *
+         * @return
+         */
         public String get_progress() {
             return raw_data;
         }

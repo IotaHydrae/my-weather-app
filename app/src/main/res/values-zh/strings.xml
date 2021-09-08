@@ -4,4 +4,10 @@
     <string name="share">分享</string>
     <string name="settings">设置</string>
     <string name="chose_city">城市列表</string>
+    <string name="weather_obsTime">数据观测时间</string>
+    <string name="weather_temp">温度</string>
+    <string name="weather_feelsLike">体感温度</string>
+    <string name="weather_text">天气状况</string>
+    <string name="weather_windDir">风向</string>
+    <string name="weather_pressure">大气压</string>
 </resources>
