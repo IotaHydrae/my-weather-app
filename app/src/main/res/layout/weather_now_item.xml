@@ -1,47 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="10dp"
-    app:cardCornerRadius="10dp"
-    android:background="#EEEEEE"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:background="#EEEEEE"
+    app:cardCornerRadius="10dp">
 
-    <LinearLayout
-        android:orientation="vertical"
+<!--    <LinearLayout-->
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/weatherNowRelativeLayout"
             android:layout_width="match_parent"
-            android:layout_margin="15dp"
-            android:layout_height="200dp">
+            android:layout_height="200dp"
+            android:layout_margin="15dp">
 
             <TextView
                 android:id="@+id/weatherNowName"
-                android:text="placeholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:id="@+id/weatherNowTime"
-                android:text="time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/weatherNowName"/>
+                android:text="placeholder"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/weatherNowTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weatherNowName"
+                android:text="time"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/weatherNowValue"
-                android:text="TEMP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:paddingBottom="20dp"
-                android:textSize="32sp"/>
+                android:text="TEMP"
+                android:textColor="@color/black"
+                android:textSize="32sp" />
 
         </RelativeLayout>
 
 
-    </LinearLayout>
+<!--    </LinearLayout>-->
 
 </com.google.android.material.card.MaterialCardView>

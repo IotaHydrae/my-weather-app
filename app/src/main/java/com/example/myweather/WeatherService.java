@@ -1,6 +1,7 @@
 package com.example.myweather;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -18,19 +19,16 @@ import com.alibaba.fastjson.JSON;
 import com.example.myweather.weather.Weather;
 import com.example.myweather.weather.WeatherInterface;
 import com.example.myweather.weather.WeatherNow;
-
-import org.json.JSONObject;
+import com.example.myweather.weather.WeatherNowAdapter;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class WeatherService extends Service implements WeatherInterface {
     private final String log_deug_tag = "WeatherService";
@@ -47,6 +45,9 @@ public class WeatherService extends Service implements WeatherInterface {
     public WeatherService() {
     }
 
+    /**
+     * Handler用于应用startService启动服务时时使用
+     */
     private final class WeatherServiceHandler extends Handler {
         public WeatherServiceHandler(Looper looper) {
             super(looper);
@@ -70,11 +71,13 @@ public class WeatherService extends Service implements WeatherInterface {
             super();
         }
 
+        /**
+         * 返回服务自身，实现应用服务间通信
+         * @return
+         */
         WeatherService getService() {
             return WeatherService.this;
         }
-
-
     }
 
     @Override
@@ -106,28 +109,29 @@ public class WeatherService extends Service implements WeatherInterface {
         serviceLooper = thread.getLooper();
         weatherServiceHandler = new WeatherServiceHandler(serviceLooper);
     }
+
     /**
      * 解析原始数据并存储到java bean中
      */
-    public void parse_raw_data() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpURLConnection connection;
-                    String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
-                    Log.d(log_deug_tag, url_str);
-                    URL url = new URL(url_str);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setReadTimeout(500);
-                    connection.setConnectTimeout(500);
+    public void get_raw_data() {
+        new Thread(() -> {
+            try {
+                HttpURLConnection connection;
+                String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
+                Log.d(log_deug_tag, url_str);
+                URL url = new URL(url_str);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(500);
+                connection.setConnectTimeout(500);
+                if(connection.getResponseCode()==200){
                     InputStream inputStream = connection.getInputStream();
                     BufferedReader reader =
                             new BufferedReader(new InputStreamReader(inputStream));
                     raw_data = reader.readLine();
                     Log.d("WeatherService", raw_data);
                     reader.close();
+                    inputStream.close();
 
                     /**
                      * 使用FastJson解析json数据
@@ -138,35 +142,46 @@ public class WeatherService extends Service implements WeatherInterface {
                     Log.d(log_deug_tag, weather.getNow());
                     weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
                     Log.d(log_deug_tag, weatherNow.getWindDir());
-                    Log.d(log_deug_tag, weatherNow.toStringList());
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+
+//                    Log.d(log_deug_tag, weatherNow.toStringList());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
 
     }
-//    public void get_raw_json() {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    OkHttpClient okHttpClient = new OkHttpClient();
-//                    String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
-//                    Request request = new Request.Builder()
-//                            .url(url_str)
-//                            .build();
-//                    Response response = okHttpClient.newCall(request).execute();
-//                    Log.d(log_deug_tag, response.body().string());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        }).start();
-//    }
 
+    public void parser_data(){
+        get_raw_data();
+        new Thread(()->{
 
+        }).start();
+    }
+
+    /**
+     * 返回通过新数据生成的Adapter
+     * @param context
+     * @return
+     */
+    public WeatherNowAdapter getWeatherNowAdapter(Context context) {
+        Log.d(log_deug_tag, weatherNow.toString());
+        String[] fixNames = {"数据观测时间",
+                "温度", "体感温度", "图标的代码",
+                "天气状况", "风向360角度", "风向",
+                "风力等级", "风速km/h", "相对湿度",
+                "当前小时累计降水量", "大气压强", "能见度",
+                "云量", "露点温度"};
+        List<String> fixNameList = Arrays.asList(fixNames);
+        List<String> varTimeList = new ArrayList<>();
+        for (int i = 0; i < fixNameList.size(); i++)
+            varTimeList.add(getObsTime().split("T")[0]);
+        List<String> varValueList = Arrays.asList(weatherNow.toStringList().split(","));
+        if(weatherNow!=null)
+            return new WeatherNowAdapter(context, fixNameList, varTimeList, varValueList);
+        else
+            return null;
+    }
 
     @Override
     public String getCode() {
