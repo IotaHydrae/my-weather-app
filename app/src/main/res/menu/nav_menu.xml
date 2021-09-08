@@ -5,5 +5,9 @@
             android:id="@+id/nav_menu_city_list"
             android:icon="@drawable/ic_flight_city"
             android:title="@string/chose_city"/>
+        <item
+            android:id="@+id/nav_menu_exit"
+            android:icon="@drawable/ic_flight_city"
+            android:title="@string/exit"/>
     </group>
 </menu>

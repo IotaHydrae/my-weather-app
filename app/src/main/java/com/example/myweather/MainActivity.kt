@@ -26,14 +26,15 @@ class MainActivity : AppCompatActivity() {
         /**
          * Activity与Service绑定成功的时候被调用
          */
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+        override fun onServiceConnected(p0: ComponentName?, service: IBinder?) {
             Log.d("MainActivity", "OnServiceConnected")
-            weatherBinder = p1 as WeatherService.WeatherBinder
+            weatherBinder = service as WeatherService.WeatherBinder
             weatherService = weatherBinder.service
             mBound = true
 
             weatherBinder.parse_raw_data()
         }
+
 
         /**
          * Service的创建进程崩溃或者被杀掉的时候才会调用
@@ -73,10 +74,32 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        main_fab.setOnClickListener {
-            updateFrame()
-            Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
+        /**
+         * 设置悬浮按钮点击事件
+         */
+        main_fab.setOnClickListener { view ->
+            var status: Boolean
+//            var flag: Boolean = false
+
+//            Snackbar.make(view, "是否刷新数据？", Snackbar.LENGTH_SHORT)
+//                .setAction("是") {
+//                    flag = true
+//
+//                }
+//                .show()
+
+            status = updateWeatherDisplay()
+//
+//            if (status)
+//                Toast.makeText(this, "数据已刷新", Toast.LENGTH_SHORT).show()
+//            else
+//                Toast.makeText(this, "数据刷新失败！", Toast.LENGTH_SHORT).show()
         }
+        /**
+         * 设置Tablayout属性
+         */
+
+
     }
 
     override fun onStart() {
@@ -130,31 +153,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateFrame() {
+    private fun updateWeatherDisplay(): Boolean {
         if (mBound) {
             progress_view.visibility = View.VISIBLE
             weatherBinder.parse_raw_data()
-            main_fab.setImageResource(R.drawable.ic_menu)
-            edit_obsTime.let {
-                it.setText(weatherService.getObsTime())
-            }
-            edit_temp.let {
-                it.setText(weatherService.getTemp())
-            }
-            edit_feelsLike.let {
-                it.setText(weatherService.getFeelsLike())
-            }
-            edit_text.let {
-                it.setText(weatherService.getText())
-            }
-            edit_windDir.let {
-                it.setText(weatherService.getWindDir())
-            }
-            edit_pressure.let {
-                it.setText(weatherService.getPressure())
-            }
+//            main_fab.setImageResource(R.drawable.ic_menu)
+//            try {
+//                weatherService.getObsTime()?.let {
+//                    edit_obsTime.setText(it)
+//                }
+//                weatherService.getTemp()?.let {
+//                    edit_temp.setText(it)
+//                }
+//                weatherService.getFeelsLike()?.let {
+//                    edit_feelsLike.setText(it)
+//                }
+//                weatherService.getText().let {
+//                    edit_text.setText(it)
+//                }
+//                weatherService.getWindDir()?.let {
+//                    edit_windDir.setText(it)
+//                }
+//                weatherService.getPressure()?.let {
+//                    edit_pressure.setText(it)
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                return false
+//            } finally {
             main_fab.setImageResource(R.drawable.ic_refresh)
             progress_view.visibility = View.INVISIBLE
+//            }
+//        } else {
+//            return false
+//        }
+
         }
+        return true
     }
 }

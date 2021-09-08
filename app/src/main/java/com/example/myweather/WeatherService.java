@@ -16,23 +16,31 @@ import androidx.annotation.NonNull;
 
 import com.alibaba.fastjson.JSON;
 import com.example.myweather.weather.Weather;
-import com.example.myweather.weather.WeatherData;
 import com.example.myweather.weather.WeatherInterface;
 import com.example.myweather.weather.WeatherNow;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class WeatherService extends Service implements WeatherInterface {
     private final String log_deug_tag = "WeatherService";
-    private String raw_data;
+    private final String location = "101010100";
+    private final String key = "d877ed5d19aa4c8ab209bf911c5fe561";
+
     private Looper serviceLooper;
     private WeatherServiceHandler weatherServiceHandler;
 
-    private WeatherData weatherData;
+    private String raw_data;
     private Weather weather;
     private WeatherNow weatherNow;
 
@@ -58,10 +66,6 @@ public class WeatherService extends Service implements WeatherInterface {
     private final WeatherBinder weatherBinder = new WeatherBinder();
 
     protected final class WeatherBinder extends Binder {
-        private HttpURLConnection connection = null;
-        private final String location = "101010100";
-        private final String key = "d877ed5d19aa4c8ab209bf911c5fe561";
-
         public WeatherBinder() {
             super();
         }
@@ -78,27 +82,20 @@ public class WeatherService extends Service implements WeatherInterface {
                 @Override
                 public void run() {
                     try {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String bytes = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
-                        Log.d(log_deug_tag, bytes);
-                        URL url = new URL(bytes);
+                        HttpURLConnection connection;
+                        String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
+                        Log.d(log_deug_tag, url_str);
+                        URL url = new URL(url_str);
                         connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("GET");
-                        connection.setReadTimeout(8000);
-                        connection.setConnectTimeout(8000);
+                        connection.setReadTimeout(500);
+                        connection.setConnectTimeout(500);
                         InputStream inputStream = connection.getInputStream();
                         BufferedReader reader =
                                 new BufferedReader(new InputStreamReader(inputStream));
                         raw_data = reader.readLine();
                         Log.d("WeatherService", raw_data);
                         reader.close();
-
-                        /**
-                         * 原始Json解析方法
-                         */
-//                        JSONObject object = new JSONObject(raw_data);
-//                        String name = object.getString("code");
-//                        Log.d(log_deug_tag, name);
 
                         /**
                          * 使用FastJson解析json数据
@@ -109,25 +106,14 @@ public class WeatherService extends Service implements WeatherInterface {
                         Log.d(log_deug_tag, weather.getNow());
                         weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
                         Log.d(log_deug_tag, weatherNow.getWindDir());
+
                     } catch (Exception e) {
                         e.printStackTrace();
-                    } finally {
-                        connection.disconnect();
                     }
                 }
             }).start();
 
         }
-
-        /**
-         * 获取任务进度
-         *
-         * @return
-         */
-        public String get_progress() {
-            return raw_data;
-        }
-
     }
 
     @Override
@@ -159,6 +145,28 @@ public class WeatherService extends Service implements WeatherInterface {
         serviceLooper = thread.getLooper();
         weatherServiceHandler = new WeatherServiceHandler(serviceLooper);
     }
+
+//    public void get_raw_json() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    OkHttpClient okHttpClient = new OkHttpClient();
+//                    String url_str = String.format("https://devapi.qweather.com/v7/weather/now?location=%s&key=%s", location, key);
+//                    Request request = new Request.Builder()
+//                            .url(url_str)
+//                            .build();
+//                    Response response = okHttpClient.newCall(request).execute();
+//                    Log.d(log_deug_tag, response.body().string());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        }).start();
+//    }
+
+
 
     @Override
     public String getCode() {
@@ -248,5 +256,13 @@ public class WeatherService extends Service implements WeatherInterface {
     @Override
     public String getDew() {
         return weatherNow.getDew();
+    }
+
+    public WeatherNow getWeatherNow() {
+        return weatherNow;
+    }
+
+    public void setWeatherNow(WeatherNow weatherNow) {
+        this.weatherNow = weatherNow;
     }
 }

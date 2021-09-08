@@ -46,6 +46,5 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.55.android'
     implementation 'de.hdodenhof:circleimageview:3.0.1'
 //    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
-    implementation("com.squareup.okhttp3:okhttp")
-    implementation("com.squareup.okhttp3:logging-interceptor")
+
 }

@@ -12,5 +12,6 @@
     <string name="weather_text">Weather condition</string>
     <string name="weather_windDir">Wind direction</string>
     <string name="weather_pressure">Atmospheric pressure</string>
+    <string name="exit">Exit</string>
 
 </resources>
