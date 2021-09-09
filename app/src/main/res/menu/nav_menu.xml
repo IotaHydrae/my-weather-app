@@ -3,11 +3,11 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_menu_city_list"
-            android:icon="@drawable/ic_flight_city"
-            android:title="@string/chose_city"/>
+            android:icon="@android:drawable/ic_menu_mapmode"
+            android:title="@string/chose_city" />
         <item
             android:id="@+id/nav_menu_exit"
-            android:icon="@drawable/ic_flight_city"
-            android:title="@string/exit"/>
+            android:icon="@android:drawable/ic_menu_close_clear_cancel"
+            android:title="@string/exit" />
     </group>
 </menu>

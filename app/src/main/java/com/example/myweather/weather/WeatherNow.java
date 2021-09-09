@@ -1,5 +1,9 @@
 package com.example.myweather.weather;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class WeatherNow {
     private String obstime;
     private String temp;
@@ -158,7 +162,7 @@ public class WeatherNow {
                 '}';
     }
 
-    public String toStringList() {
+    public String toStringSplited() {
         return obstime +
                 "," + temp +
                 "," + feelsLike +
@@ -174,5 +178,9 @@ public class WeatherNow {
                 "," + vis +
                 "," + cloud +
                 "," + dew;
+    }
+
+    public List<String> toStringList(){
+        return Arrays.asList(toStringSplited().split(","));
     }
 }

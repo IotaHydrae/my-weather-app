@@ -4,30 +4,31 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.opengl.Visibility
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
 import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myweather.weather.WeatherBean
 import com.example.myweather.weather.WeatherNowAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var weatherAdapter: WeatherNowAdapter
     private lateinit var weatherBinder: WeatherService.WeatherBinder
     private lateinit var weatherService: WeatherService
     private var mBound: Boolean = false
+
+    private val weatherBeanList = ArrayList<WeatherBean>()
 
     private val connection = object : ServiceConnection {
 
@@ -58,15 +59,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        /**
-         * 客户端通过调用 bindService() 绑定到服务。
-         * bindService() 的返回值指示所请求的服务是否存在，以及是否允许客户端访问该服务。
-         * 调用时，它必须提供 ServiceConnection 的实现，后者会监控与服务的连接。
-         */
-        Intent(this, WeatherService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
+        initViews()
+    }
 
+    private fun initViews() {
         /**
          * 设置导航栏按钮
          */
@@ -92,33 +88,40 @@ class MainActivity : AppCompatActivity() {
         }
 
         /**
-         * 设置悬浮按钮点击事件
-         */
-        main_fab.setOnClickListener { view ->
-            main_swipeRefreshLayout.isRefreshing=true
-            Snackbar.make(view, "是否手动刷新数据？", Snackbar.LENGTH_SHORT)
-                .setAction("是") {refresh()}
-                .show()
-        }
-        /**
          * 设置Tablayout属性
          */
 
         /**
          * 填充RecycleView
          */
+        main_recyclerView.postDelayed({ weatherService.initWeatherData(weatherBeanList) }, 1000)
+
         val gridLayoutManager = GridLayoutManager(this, 2)
-//        gridLayoutManager.orientation=LinearLayoutManager.VERTICAL
+        gridLayoutManager.orientation = LinearLayoutManager.VERTICAL
         main_recyclerView.layoutManager = gridLayoutManager
-        main_recyclerView.adapter = WeatherNowAdapter(this, null, null, null)
+
+        weatherAdapter = WeatherNowAdapter(this, weatherBeanList)
+        main_recyclerView.adapter = weatherAdapter
 
         /**
          *  设置下拉刷新
          */
         Log.d("Main", "Setting swipeRefreshLayout")
         main_swipeRefreshLayout.setOnRefreshListener {
-            refresh()
+            refreshWeather(weatherAdapter)
         }
+
+        /**
+         * 设置悬浮按钮点击事件
+         */
+        main_fab.setOnClickListener { view ->
+            main_swipeRefreshLayout.isRefreshing = true
+            Snackbar.make(view, "是否手动刷新数据？", Snackbar.LENGTH_SHORT)
+                .setAction("是") { refreshWeather(weatherAdapter) }
+                .show()
+        }
+        main_swipeRefreshLayout.isRefreshing = true
+        main_swipeRefreshLayout.postDelayed({ refreshWeather(weatherAdapter) }, 1000)
     }
 
     override fun onStart() {
@@ -131,9 +134,8 @@ class MainActivity : AppCompatActivity() {
         Intent(this, WeatherService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
-        main_swipeRefreshLayout.isRefreshing=true
-        main_swipeRefreshLayout.postDelayed({ refresh() },1000)
-
+        main_swipeRefreshLayout.isRefreshing = true
+        main_swipeRefreshLayout.postDelayed({ refreshWeather(weatherAdapter) }, 1000)
     }
 
     override fun onStop() {
@@ -175,29 +177,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTIme(): String {
-        val calendar = Calendar.getInstance()
-        calendar.timeZone = TimeZone.getTimeZone("GMT+8:00")
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DATE)
-
-        val str = StringBuffer()
-        str.append(month)
-        str.append("/")
-        str.append(day)
-        return str.toString()
-    }
-
-    private fun refresh():Boolean{
-        weatherService.get_raw_data()
-        main_swipeRefreshLayout.isRefreshing=false
-        return if(weatherService.weatherNow!=null) {
-            Toast.makeText(this, "数据已更新", Toast.LENGTH_SHORT).show()
-            main_recyclerView.adapter = weatherService.getWeatherNowAdapter(this)
-            true
-        } else{
-            Toast.makeText(this, "数据更新失败，检查网络连接！", Toast.LENGTH_SHORT).show()
-            false
+    private fun refreshWeather(adapter: WeatherNowAdapter) {
+        thread {
+            Thread.sleep(1000)
+            runOnUiThread {
+                weatherService.initWeatherData(weatherBeanList)
+                adapter.notifyDataSetChanged()
+                main_swipeRefreshLayout.isRefreshing = false
+            }
         }
     }
 }

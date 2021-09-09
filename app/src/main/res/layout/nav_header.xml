@@ -2,15 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="180dp"
-    android:padding="10dp"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:padding="10dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/userIcon"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:src="@drawable/ic_mouse"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_mouse" />
 
     <TextView
         android:id="@+id/mailText"
@@ -19,7 +19,7 @@
         android:layout_alignParentBottom="true"
         android:text="people@universe.com"
         android:textColor="#FFFFFF"
-        android:textSize="14sp"/>
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/userNameText"
@@ -28,7 +28,7 @@
         android:layout_above="@id/mailText"
         android:text="Wilson"
         android:textColor="#FFFFFF"
-        android:textSize="14sp"/>
+        android:textSize="14sp" />
 
 
 </RelativeLayout>

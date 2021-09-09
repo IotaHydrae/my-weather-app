@@ -1,7 +1,6 @@
 package com.example.myweather;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -17,9 +16,9 @@ import androidx.annotation.NonNull;
 
 import com.alibaba.fastjson.JSON;
 import com.example.myweather.weather.Weather;
+import com.example.myweather.weather.WeatherBean;
 import com.example.myweather.weather.WeatherInterface;
 import com.example.myweather.weather.WeatherNow;
-import com.example.myweather.weather.WeatherNowAdapter;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -28,7 +27,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class WeatherService extends Service implements WeatherInterface {
     private final String log_deug_tag = "WeatherService";
@@ -87,6 +88,11 @@ public class WeatherService extends Service implements WeatherInterface {
     }
 
     @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
 
@@ -98,7 +104,7 @@ public class WeatherService extends Service implements WeatherInterface {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+        super.onDestroy();
     }
 
     @Override
@@ -124,7 +130,7 @@ public class WeatherService extends Service implements WeatherInterface {
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(500);
                 connection.setConnectTimeout(500);
-                if(connection.getResponseCode()==200){
+                if (connection.getResponseCode() == 200) {
                     InputStream inputStream = connection.getInputStream();
                     BufferedReader reader =
                             new BufferedReader(new InputStreamReader(inputStream));
@@ -141,10 +147,8 @@ public class WeatherService extends Service implements WeatherInterface {
                     weather = JSON.parseObject(raw_data, Weather.class);
                     Log.d(log_deug_tag, weather.getNow());
                     weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
-                    Log.d(log_deug_tag, weatherNow.getWindDir());
                 }
 
-//                    Log.d(log_deug_tag, weatherNow.toStringList());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -152,20 +156,28 @@ public class WeatherService extends Service implements WeatherInterface {
 
     }
 
-    public void parser_data(){
-        get_raw_data();
-        new Thread(()->{
+    public String getTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DATE);
 
-        }).start();
+        StringBuffer str = new StringBuffer();
+        str.append(month);
+        str.append("/");
+        str.append(day);
+
+        return str.toString();
     }
 
-    /**
-     * 返回通过新数据生成的Adapter
-     * @param context
-     * @return
-     */
-    public WeatherNowAdapter getWeatherNowAdapter(Context context) {
-        Log.d(log_deug_tag, weatherNow.toString());
+    public String getWeatherTime() {
+        String[] str = getObsTime().split("T")[0].split("-");
+        return new StringBuffer()/*.append(str[0]+"/")*/.append(str[1] + "/").append(str[2]).toString();
+    }
+
+    public void initWeatherData(List<WeatherBean> weatherBeanList) {
+        weatherBeanList.clear();
+        get_raw_data();
         String[] fixNames = {"数据观测时间",
                 "温度", "体感温度", "图标的代码",
                 "天气状况", "风向360角度", "风向",
@@ -175,12 +187,17 @@ public class WeatherService extends Service implements WeatherInterface {
         List<String> fixNameList = Arrays.asList(fixNames);
         List<String> varTimeList = new ArrayList<>();
         for (int i = 0; i < fixNameList.size(); i++)
-            varTimeList.add(getObsTime().split("T")[0]);
-        List<String> varValueList = Arrays.asList(weatherNow.toStringList().split(","));
-        if(weatherNow!=null)
-            return new WeatherNowAdapter(context, fixNameList, varTimeList, varValueList);
-        else
-            return null;
+//            varTimeList.add(getObsTime().split("T")[0]);
+            varTimeList.add(getWeatherTime());
+        List<String> varValueList = weatherNow.toStringList();
+
+        for (int i = 0; i < fixNameList.size(); i++)
+            weatherBeanList.add(new WeatherBean(
+                    fixNameList.get(i),
+                    varTimeList.get(i),
+                    varValueList.get(i)
+            ));
+
     }
 
     @Override

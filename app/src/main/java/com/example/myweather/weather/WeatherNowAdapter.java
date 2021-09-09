@@ -12,28 +12,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myweather.R;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherNowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Context mContext;
-    private List<String> weatherName;
-    private List<String> weatherTime;
-    private List<String> weatherValue;
+    private final Context mContext;
+
+    private final List<WeatherBean> weatherBeanList;
 
 
-    public WeatherNowAdapter(Context context,
-                             List<String> name,
-                             List<String> time,
-                             List<String> value){
+    public WeatherNowAdapter(Context context, List<WeatherBean> weatherBeans) {
         mContext = context;
-        weatherName = name;
-        weatherTime = time;
-        weatherValue = value;
+        weatherBeanList = weatherBeans;
     }
 
-    private final class WeatherNowHolder extends RecyclerView.ViewHolder{
+    private final class WeatherNowHolder extends RecyclerView.ViewHolder {
         public TextView weatherNowName;
         public TextView weatherNowTime;
         public TextView weatherNowValue;
@@ -41,9 +33,9 @@ public class WeatherNowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public WeatherNowHolder(@NonNull View itemView) {
             super(itemView);
 
-            weatherNowName = (TextView) itemView.findViewById(R.id.weatherNowName);
-            weatherNowTime = (TextView) itemView.findViewById(R.id.weatherNowTime);
-            weatherNowValue = (TextView) itemView.findViewById(R.id.weatherNowValue);
+            weatherNowName = itemView.findViewById(R.id.weatherNowName);
+            weatherNowTime = itemView.findViewById(R.id.weatherNowTime);
+            weatherNowValue = itemView.findViewById(R.id.weatherNowValue);
         }
     }
 
@@ -61,14 +53,13 @@ public class WeatherNowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         WeatherNowHolder weatherNowHolder = (WeatherNowHolder) holder;
 
-        try{
-            if(weatherName!=null)
-            weatherNowHolder.weatherNowName.setText(weatherName.get(position));
-            if(weatherTime!=null)
-            weatherNowHolder.weatherNowTime.setText(weatherTime.get(position));
-            if(weatherValue!=null)
-            weatherNowHolder.weatherNowValue.setText(weatherValue.get(position));
-        }catch (Exception e){
+        try {
+            if (weatherBeanList != null) {
+                weatherNowHolder.weatherNowName.setText(weatherBeanList.get(position).getName());
+                weatherNowHolder.weatherNowTime.setText(weatherBeanList.get(position).getTime());
+                weatherNowHolder.weatherNowValue.setText(weatherBeanList.get(position).getValue());
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -76,7 +67,7 @@ public class WeatherNowAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemCount() {
-        return weatherName==null?0:weatherName.size();
+        return weatherBeanList == null ? 0 : weatherBeanList.size();
     }
 
 
