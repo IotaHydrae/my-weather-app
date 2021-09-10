@@ -104,23 +104,21 @@ class MainActivity : AppCompatActivity() {
         Log.d("Main", "Setting RecycleView")
         main_recyclerView.postDelayed({ weatherService.initWeatherData(weatherBeanList) }, 1000)
 
-        val gridLayoutManager = GridLayoutManager(this, 2)
-
-//        gridLayoutManager.spanSizeLookup = object :GridLayoutManager.SpanSizeLookup(){
-//            override fun getSpanSize(position: Int): Int {
-//                val bean = weatherBeanList.get(position)
-//                return when(bean.type){
-//                    WeatherEnums.RECYCLERVIEW_TYPE_FULL ->
-//                        return 4
-//                    WeatherEnums.RECYCLERVIEW_TYPE_HALF ->
-//                        return 2
-//                    WeatherEnums.RECYCLERVIEW_TYPE_QUARTER ->
-//                        return 1
-//                    else -> return 1
-//                }
-//            }
-//        }
-//        gridLayoutManager.orientation = LinearLayoutManager.VERTICAL
+        val gridLayoutManager = GridLayoutManager(this, 4)
+        gridLayoutManager.spanSizeLookup = object :GridLayoutManager.SpanSizeLookup(){
+            override fun getSpanSize(position: Int): Int {
+                val bean = weatherBeanList.get(position)
+                return when(bean.type){
+                    WeatherEnums.RECYCLERVIEW_TYPE_FULL ->
+                        return 4
+                    WeatherEnums.RECYCLERVIEW_TYPE_HALF ->
+                        return 2
+                    WeatherEnums.RECYCLERVIEW_TYPE_QUARTER ->
+                        return 1
+                    else -> return 1
+                }
+            }
+        }
         main_recyclerView.layoutManager = gridLayoutManager
 
         weatherAdapter = WeatherNowAdapter(this, weatherBeanList)
@@ -140,12 +138,6 @@ class MainActivity : AppCompatActivity() {
         main_fab.setOnClickListener { view ->
             main_swipeRefreshLayout.isRefreshing = true
             refreshWeather(weatherAdapter)
-//            Snackbar.make(view, R.string.manualRefresh, Snackbar.LENGTH_SHORT)
-//                .setAction(R.string.yes) {
-//                    refreshWeather(weatherAdapter)
-//
-//                }
-//                .show()
         }
     }
 
