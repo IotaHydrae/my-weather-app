@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.myweather",
+  "applicationId": "com.universe.myweather",
   "variantName": "release",
   "elements": [
     {
@@ -12,8 +12,8 @@
       "filters": [],
       "attributes": [],
       "versionCode": 1,
-      "versionName": "1.0",
-      "outputFile": "app-release.apk"
+      "versionName": "1.1.3",
+      "outputFile": "app-release-1.1.3.apk"
     }
   ],
   "elementType": "File"
