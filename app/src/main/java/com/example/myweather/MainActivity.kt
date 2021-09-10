@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity() {
         initViews()
     }
 
+    /**
+     * 初始化界面以及监听事件等
+     */
     private fun initViews() {
         /**
          * 设置导航栏按钮
@@ -92,8 +95,9 @@ class MainActivity : AppCompatActivity() {
          */
 
         /**
-         * 填充RecycleView
+         * 设置RecycleView
          */
+        Log.d("Main", "Setting RecycleView")
         main_recyclerView.postDelayed({ weatherService.initWeatherData(weatherBeanList) }, 1000)
 
         val gridLayoutManager = GridLayoutManager(this, 2)
@@ -116,8 +120,8 @@ class MainActivity : AppCompatActivity() {
          */
         main_fab.setOnClickListener { view ->
             main_swipeRefreshLayout.isRefreshing = true
-            Snackbar.make(view, "是否手动刷新数据？", Snackbar.LENGTH_SHORT)
-                .setAction("是") { refreshWeather(weatherAdapter) }
+            Snackbar.make(view, R.string.manualRefresh, Snackbar.LENGTH_SHORT)
+                .setAction(R.string.yes) { refreshWeather(weatherAdapter) }
                 .show()
         }
         main_swipeRefreshLayout.isRefreshing = true

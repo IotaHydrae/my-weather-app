@@ -159,20 +159,23 @@ public class WeatherService extends Service implements WeatherInterface {
     public String getTime() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DATE);
 
-        StringBuffer str = new StringBuffer();
-        str.append(month);
-        str.append("/");
-        str.append(day);
-
-        return str.toString();
+        return new StringBuffer()
+                .append(calendar.get(Calendar.MONTH))
+                .append("/")
+                .append(calendar.get(Calendar.DATE))
+                .toString();
     }
 
     public String getWeatherTime() {
-        String[] str = getObsTime().split("T")[0].split("-");
-        return new StringBuffer()/*.append(str[0]+"/")*/.append(str[1] + "/").append(str[2]).toString();
+        if(weatherNow!=null){
+            String[] str = getObsTime().split("T")[0].split("-");
+            return new StringBuffer()/*.append(str[0]+"/")*/
+                    .append(str[1] + "/")
+                    .append(str[2])
+                    .toString();
+        }else
+            return "";
     }
 
     public void initWeatherData(List<WeatherBean> weatherBeanList) {
@@ -186,18 +189,31 @@ public class WeatherService extends Service implements WeatherInterface {
                 "云量", "露点温度"};
         List<String> fixNameList = Arrays.asList(fixNames);
         List<String> varTimeList = new ArrayList<>();
-        for (int i = 0; i < fixNameList.size(); i++)
+        if(weatherNow!=null) {
+
+            for (int i = 0; i < fixNameList.size(); i++)
 //            varTimeList.add(getObsTime().split("T")[0]);
-            varTimeList.add(getWeatherTime());
-        List<String> varValueList = weatherNow.toStringList();
+                varTimeList.add(getWeatherTime());
+            List<String> varValueList = weatherNow.toStringList();
 
-        for (int i = 0; i < fixNameList.size(); i++)
-            weatherBeanList.add(new WeatherBean(
-                    fixNameList.get(i),
-                    varTimeList.get(i),
-                    varValueList.get(i)
-            ));
+            for (int i = 0; i < fixNameList.size(); i++)
+                weatherBeanList.add(new WeatherBean(
+                        fixNameList.get(i),
+                        varTimeList.get(i),
+                        varValueList.get(i)
+                ));
+        }else{
+            for (int i = 0; i < fixNameList.size(); i++)
+//            varTimeList.add(getObsTime().split("T")[0]);
+                varTimeList.add(getTime());
 
+            for (int i = 0; i < fixNameList.size(); i++)
+                weatherBeanList.add(new WeatherBean(
+                        fixNameList.get(i),
+                        varTimeList.get(i),
+                        ""
+                ));
+        }
     }
 
     @Override

@@ -15,5 +15,8 @@
     <string name="exit">Exit</string>
     <string name="weather">Weather</string>
     <string name="location">GNSS</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="manualRefresh">Refresh manually?</string>
 
 </resources>
