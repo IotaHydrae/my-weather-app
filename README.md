@@ -5,4 +5,5 @@ MyWeather是按照Material Design设计风格，基于和风天气Web API设计�
 
 - [ ] 添加位置服务
 - [ ] 添加多城支持
+- [ ] 界面卡片支持编辑
 - [ ] 使用MVVM架构重写
