@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import com.alibaba.fastjson.JSON;
 import com.example.myweather.weather.Weather;
 import com.example.myweather.weather.WeatherBean;
+import com.example.myweather.weather.WeatherEnums;
 import com.example.myweather.weather.WeatherInterface;
 import com.example.myweather.weather.WeatherNow;
 
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class WeatherService extends Service implements WeatherInterface {
@@ -128,8 +130,8 @@ public class WeatherService extends Service implements WeatherInterface {
                 URL url = new URL(url_str);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setReadTimeout(500);
-                connection.setConnectTimeout(500);
+                connection.setReadTimeout(300);
+                connection.setConnectTimeout(300);
                 if (connection.getResponseCode() == 200) {
                     InputStream inputStream = connection.getInputStream();
                     BufferedReader reader =
@@ -147,6 +149,16 @@ public class WeatherService extends Service implements WeatherInterface {
                     weather = JSON.parseObject(raw_data, Weather.class);
                     Log.d(log_deug_tag, weather.getNow());
                     weatherNow = JSON.parseObject(weather.getNow(), WeatherNow.class);
+//
+//                    Map weatherMap = JSON.parseObject(raw_data,Map.class);
+//                    for (Object obj : weatherMap.keySet()){
+//                        Log.d("main", "key:"+obj+", value: "+weatherMap.keySet());
+//                    }
+
+//                    Map weatherNowMap = JSON.parseObject(weather.getNow(), Map.class);
+//                    for (Object obj : weatherNowMap.keySet()){
+//                        Log.d("main", "**** key:"+obj+", value: "+weatherNowMap.get(obj));
+//                    }
                 }
 
             } catch (Exception e) {
@@ -180,7 +192,6 @@ public class WeatherService extends Service implements WeatherInterface {
 
     public void initWeatherData(List<WeatherBean> weatherBeanList) {
         weatherBeanList.clear();
-        get_raw_data();
         String[] fixNames = {"数据观测时间",
                 "温度", "体感温度", "图标的代码",
                 "天气状况", "风向360角度", "风向",
@@ -196,23 +207,38 @@ public class WeatherService extends Service implements WeatherInterface {
                 varTimeList.add(getWeatherTime());
             List<String> varValueList = weatherNow.toStringList();
 
-            for (int i = 0; i < fixNameList.size(); i++)
+            WeatherEnums type = WeatherEnums.RECYCLERVIEW_TYPE_HALF;
+            for (int i = 0; i < fixNameList.size(); i++){
+                if(i == 0){type=WeatherEnums.RECYCLERVIEW_TYPE_FULL;}
+                else if(i>0&&i<5){type=WeatherEnums.RECYCLERVIEW_TYPE_HALF;}
+                else {type=WeatherEnums.RECYCLERVIEW_TYPE_QUARTER;}
                 weatherBeanList.add(new WeatherBean(
+                        type,
                         fixNameList.get(i),
                         varTimeList.get(i),
+                        0,
                         varValueList.get(i)
                 ));
+            }
+
         }else{
             for (int i = 0; i < fixNameList.size(); i++)
 //            varTimeList.add(getObsTime().split("T")[0]);
                 varTimeList.add(getTime());
 
-            for (int i = 0; i < fixNameList.size(); i++)
+            WeatherEnums type = WeatherEnums.RECYCLERVIEW_TYPE_HALF;
+            for (int i = 0; i < fixNameList.size(); i++){
+                if(i == 0){type=WeatherEnums.RECYCLERVIEW_TYPE_FULL;}
+                else if(i>10){type=WeatherEnums.RECYCLERVIEW_TYPE_QUARTER;}
                 weatherBeanList.add(new WeatherBean(
+                        type,
                         fixNameList.get(i),
                         varTimeList.get(i),
+                        0,
                         ""
                 ));
+            }
+
         }
     }
 

@@ -12,9 +12,12 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myweather.weather.WeatherBean
+import com.example.myweather.weather.WeatherEnums
 import com.example.myweather.weather.WeatherNowAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
@@ -40,8 +43,6 @@ class MainActivity : AppCompatActivity() {
             weatherBinder = service as WeatherService.WeatherBinder
             weatherService = weatherBinder.service
             mBound = true
-
-            weatherService.get_raw_data()
         }
 
 
@@ -54,12 +55,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
         initViews()
+//        val MainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
     /**
@@ -79,12 +83,12 @@ class MainActivity : AppCompatActivity() {
          */
         navView.setNavigationItemSelectedListener {
             when (it.itemId) {
-
                 R.id.nav_menu_city_list -> {
                     Toast.makeText(this, "nav city list clicked", Toast.LENGTH_SHORT).show()
-                    true
                 }
-                else -> true
+                R.id.nav_menu_exit -> {
+                    Toast.makeText(this, "nav exit clicked", Toast.LENGTH_SHORT).show()
+                }
             }
             drawerLayout.closeDrawers()
             true
@@ -101,7 +105,22 @@ class MainActivity : AppCompatActivity() {
         main_recyclerView.postDelayed({ weatherService.initWeatherData(weatherBeanList) }, 1000)
 
         val gridLayoutManager = GridLayoutManager(this, 2)
-        gridLayoutManager.orientation = LinearLayoutManager.VERTICAL
+
+//        gridLayoutManager.spanSizeLookup = object :GridLayoutManager.SpanSizeLookup(){
+//            override fun getSpanSize(position: Int): Int {
+//                val bean = weatherBeanList.get(position)
+//                return when(bean.type){
+//                    WeatherEnums.RECYCLERVIEW_TYPE_FULL ->
+//                        return 4
+//                    WeatherEnums.RECYCLERVIEW_TYPE_HALF ->
+//                        return 2
+//                    WeatherEnums.RECYCLERVIEW_TYPE_QUARTER ->
+//                        return 1
+//                    else -> return 1
+//                }
+//            }
+//        }
+//        gridLayoutManager.orientation = LinearLayoutManager.VERTICAL
         main_recyclerView.layoutManager = gridLayoutManager
 
         weatherAdapter = WeatherNowAdapter(this, weatherBeanList)
@@ -120,12 +139,14 @@ class MainActivity : AppCompatActivity() {
          */
         main_fab.setOnClickListener { view ->
             main_swipeRefreshLayout.isRefreshing = true
-            Snackbar.make(view, R.string.manualRefresh, Snackbar.LENGTH_SHORT)
-                .setAction(R.string.yes) { refreshWeather(weatherAdapter) }
-                .show()
+            refreshWeather(weatherAdapter)
+//            Snackbar.make(view, R.string.manualRefresh, Snackbar.LENGTH_SHORT)
+//                .setAction(R.string.yes) {
+//                    refreshWeather(weatherAdapter)
+//
+//                }
+//                .show()
         }
-        main_swipeRefreshLayout.isRefreshing = true
-        main_swipeRefreshLayout.postDelayed({ refreshWeather(weatherAdapter) }, 1000)
     }
 
     override fun onStart() {
@@ -138,6 +159,9 @@ class MainActivity : AppCompatActivity() {
         Intent(this, WeatherService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
+        /**
+         * 实现onStart周期自动刷新recyclerView
+         */
         main_swipeRefreshLayout.isRefreshing = true
         main_swipeRefreshLayout.postDelayed({ refreshWeather(weatherAdapter) }, 1000)
     }
@@ -181,11 +205,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 在子线程中通过服务类方法Http请求数据，
+     * 延时是为了让缓慢地Http请求获得地数据，
+     * 能够跟得上Ui线程刷新速度，此外，
+     * 应尽量减少Ui线程工作量。
+     */
     private fun refreshWeather(adapter: WeatherNowAdapter) {
         thread {
+            main_swipeRefreshLayout.post { weatherService.get_raw_data() }
             Thread.sleep(1000)
+            weatherService.initWeatherData(weatherBeanList)
             runOnUiThread {
-                weatherService.initWeatherData(weatherBeanList)
                 adapter.notifyDataSetChanged()
                 main_swipeRefreshLayout.isRefreshing = false
             }
