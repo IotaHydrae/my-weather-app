@@ -2,3 +2,7 @@
 
 #### 介绍
 MyWeather是按照Material Design设计风格，基于和风天气Web API设计的，综合天气、定位等功能于一体的App。
+
+- [ ] 添加位置服务
+- [ ] 添加多城支持
+- [ ] 使用MVVM架构重写
